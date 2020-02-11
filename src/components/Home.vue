@@ -7,31 +7,34 @@
         <span>电商后台管理系统</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button>
-      <el-button type="info" @click="getMenuList">测试</el-button>
     </el-header>
     <!-- 页面主体 -->
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside width="200px">
-        <el-menu background-color="#333744" text-color="#fff" active-text-color="#ffd04b">
+      <el-aside :width="isCollapse? '64px':'200px'">
+        <div class="toggle-button" @click="toggleCollapse">|||</div>
+        <el-menu
+          background-color="#333744"
+          text-color="#fff"
+          active-text-color="#409BFF"
+          unique-opened
+          :collapse="isCollapse"
+          :collapse-transition="false"
+        >
           <el-submenu :index="item.id+''" v-for="item in menuList" :key="item.id">
             <!-- 一级菜单模板区 -->
             <template slot="title">
               <!-- 图标 -->
-              <i class="el-icon-location"></i>
+              <i :class="iconObj[item.id]"></i>
               <!-- 文本 -->
               <span>{{item.name}}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item
-              :index="subItem.id+''"
-              v-for="subItem in item.children"
-              :key="subItem.id"
-            >
+            <el-menu-item :index="subItem.id+''" v-for="subItem in item.children" :key="subItem.id">
               <!-- 二级菜单模板区 -->
               <template slot="title">
                 <!-- 图标 -->
-                <i class="el-icon-location"></i>
+                <i class="el-icon-menu"></i>
                 <!-- 文本 -->
                 <span>{{subItem.name}}</span>
               </template>
@@ -49,7 +52,15 @@ export default {
   data () {
     return {
       // 左侧菜单数据
-      menuList: []
+      menuList: [],
+      iconObj: {
+        1: 'fa fa-user',
+        2: 'fa fa-cube',
+        3: 'fa fa-shopping-bag',
+        4: 'fa fa-file-text-o',
+        5: 'fa fa-bar-chart'
+      },
+      isCollapse: false
     }
   },
   created () {
@@ -67,6 +78,10 @@ export default {
       const { data: res } = await this.$http.get('menu')
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
       this.menuList = JSON.parse(JSON.stringify(res.data))
+    },
+    // 点击按钮控制菜单的折叠和展开
+    toggleCollapse () {
+      this.isCollapse = !this.isCollapse
     }
   }
 }
@@ -90,11 +105,26 @@ export default {
 }
 .el-aside {
   background-color: #333744;
+  .el-menu {
+    border-right: none;
+  }
 }
 .el-main {
   background-color: #eaedf1;
 }
 .home-container {
   height: 100%;
+}
+.fa {
+  margin-right: 10px;
+}
+.toggle-button {
+  background-color: #4a5064;
+  font-size: 10px;
+  line-height: 24px;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 0.2em;
+  cursor: pointer;
 }
 </style>
