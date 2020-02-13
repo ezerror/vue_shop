@@ -20,17 +20,24 @@
           unique-opened
           :collapse="isCollapse"
           :collapse-transition="false"
+          router
+          :default-active="activePath"
         >
           <el-submenu :index="item.id+''" v-for="item in menuList" :key="item.id">
             <!-- 一级菜单模板区 -->
             <template slot="title">
               <!-- 图标 -->
-              <i :class="iconObj[item.id]"></i>
+              <i :class="item.icon"></i>
               <!-- 文本 -->
               <span>{{item.name}}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="subItem.id+''" v-for="subItem in item.children" :key="subItem.id">
+            <el-menu-item
+              :index="'/'+subItem.path"
+              v-for="subItem in item.children"
+              :key="subItem.id"
+              @click="saveNavState('/'+subItem.path)"
+            >
               <!-- 二级菜单模板区 -->
               <template slot="title">
                 <!-- 图标 -->
@@ -43,7 +50,9 @@
         </el-menu>
       </el-aside>
       <!-- 右部主体区域 -->
-      <el-main></el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -53,18 +62,13 @@ export default {
     return {
       // 左侧菜单数据
       menuList: [],
-      iconObj: {
-        1: 'fa fa-user',
-        2: 'fa fa-cube',
-        3: 'fa fa-shopping-bag',
-        4: 'fa fa-file-text-o',
-        5: 'fa fa-bar-chart'
-      },
-      isCollapse: false
+      isCollapse: false,
+      activePath: ''
     }
   },
   created () {
     this.getMenuList()
+    this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
     logout: function () {
@@ -82,6 +86,11 @@ export default {
     // 点击按钮控制菜单的折叠和展开
     toggleCollapse () {
       this.isCollapse = !this.isCollapse
+    },
+    // 保存所选菜单
+    saveNavState (activePath) {
+      window.sessionStorage.setItem('activePath', activePath)
+      this.activePath = activePath
     }
   }
 }
